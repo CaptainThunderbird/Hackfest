@@ -1,5 +1,10 @@
-MiniDataDevs/
-|-----datasets/
-|     |---coffee.csv
-|     |---movies.json
-|     |___datasets.json
+your-project/
+├── datasets/
+│   ├── coffee.csv
+│   ├── netflix_titles.csv
+│   ├── pokemon.csv
+│   ├── weather.csv
+│   ├── titanic.csv
+│   └── datasets.json
+├── app.py  # Streamlit/FastAPI
+└── README.md
