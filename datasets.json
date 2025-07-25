@@ -1,14 +1,31 @@
 {
-  "coffee": {
-    "file": "coffee.csv",
+  "cereal": {
+    "file": "cereal.csv",
     "difficulty": "easy",
-    "description": "Coffee ratings by country (100 rows).",
+    "description": "fill later",
     "colab_link": "https://colab.research.google.com/..."
   },
-  "movies": {
-    "file": "movies.json",
+  "coffee": {
+    "file": "df_arabica_clean.csv",
     "difficulty": "medium",
-    "description": "Netflix shows with genres (500 rows).",
+    "description": "fill later",
     "colab_link": "https://colab.research.google.com/..."
+  },
+  "food": {
+  "file": "indian_food.csv",
+  "difficulty":"fill later",
+  "colab_link":""
+
+
+  },
+  "cinema": {
+    "file": "netflix_titles.csv",
+    "difficulty":"fill later",
+    "colab_link":""
+  },
+  "clothes": {
+    "file": "women_clothing_ecommerce_sales.csv",
+    "difficulty":"fill later",
+    "colab_link":""
   }
 }
