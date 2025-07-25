@@ -1,0 +1,5 @@
+MiniDataDevs/
+|-----datasets/
+|     |---coffee.csv
+|     |---movies.json
+|     |___datasets.json
