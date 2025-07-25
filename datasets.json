@@ -1,0 +1,14 @@
+{
+  "coffee": {
+    "file": "coffee.csv",
+    "difficulty": "easy",
+    "description": "Coffee ratings by country (100 rows).",
+    "colab_link": "https://colab.research.google.com/..."
+  },
+  "movies": {
+    "file": "movies.json",
+    "difficulty": "medium",
+    "description": "Netflix shows with genres (500 rows).",
+    "colab_link": "https://colab.research.google.com/..."
+  }
+}
