@@ -3,7 +3,7 @@ import pandas as pd
 
 class DatasetAssistant:
     def __init__(self, loader):
-        self.loader = loader  # Your DatasetLoader instance
+        self.loader = loader  # DatasetLoader instance
         self.projects = {
             "avengers": {
                 "task": "Count characters who died more than once",
