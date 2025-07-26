@@ -60,16 +60,14 @@ df['percentage'] = df['percentage'].str.rstrip('%').astype('float')"""
             if name not in self.datasets:
                 raise ValueError(f"Unknown dataset: {name}")
                 
-            df = pd.read_csv(
-                self.datasets[name]["url"],
-                encoding='latin-1',
-                on_bad_lines='warn'
-            )
-            
+            df = pd.read_csv(self.datasets[name]["url"], encoding="latin-1", on_bad_lines="warn")
+
             # Apply preprocessing
             if "preprocessing" in self.datasets[name]:
-                exec(self.datasets[name]["preprocessing"], globals(), {'df': df})
-            
+                local_vars = {"df": df}
+                exec(self.datasets[name]["preprocessing"], {}, local_vars)
+                df = local_vars["df"]  # Reassign df to the modified DataFrame
+
             # attach metadata
             df.attrs = {
                 'difficulty': self.datasets[name]["difficulty"],
