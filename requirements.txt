@@ -1,0 +1,4 @@
+pandas>=2.0.0
+python-dotenv>=1.0.0
+kaggle>=1.5.12
+ipywidgets>=8.0.0

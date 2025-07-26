@@ -18,3 +18,12 @@ repo/
 ├── .gitignore
 ├── requirements.txt       # Python dependencies
 └── README.md
+
+MiniDataDevs/
+├── config/
+│   ├── kaggle.json       # Kaggle API credentials
+│   └── datasets.json     # Preloaded dataset metadata
+├── data/
+│   └── preloaded/        # CSV files here
+└── notebooks/
+    └── Datasets.ipynb    # Notebook

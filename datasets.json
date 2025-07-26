@@ -1,46 +1,24 @@
 {
-  "cereal": {
-    "file": "cereal.csv",
+  "avengers": {
+    "file": "avengers.csv",
     "difficulty": "easy",
-    "description": "fill later",
-    "colab_link": "https://colab.research.google.com/...",
-    "Steps": [
-      "Write steps to working with this data set"
-    ]
+    "description": "fill later"
   },
-  "coffee": {
-    "file": "df_arabica_clean.csv",
+  "college-majors": {
+    "file": "majors-list.csv",
     "difficulty": "medium",
-    "description": "fill later",
-    "colab_link": "https://colab.research.google.com/...",
-    "Steps": [
-      "Write steps to working with this data set"
-    ]
+    "description": "fill later"
   },
-  "food": {
-  "file": "indian_food.csv",
-  "difficulty":"fill later",
-  "colab_link":"",
-  "Steps": [
-      "Write steps to working with this data set"
-    ]
+  "lyrics": {
+  "file": "genius_hip_hop_lyrics.csv",
+  "difficulty":"hard",
+  "description":"fill later"
 
 
   },
-  "cinema": {
-    "file": "netflix_titles.csv",
-    "difficulty":"fill later",
-    "colab_link":"",
-    "Steps": [
-      "Write steps to working with this data set"
-    ]
-  },
-  "clothes": {
-    "file": "women_clothing_ecommerce_sales.csv",
-    "difficulty":"fill later",
-    "colab_link":"",
-    "Steps": [
-      "Write steps to working with this data set"
-    ]
+  "masculinity": {
+    "file": "masculinity-survey.csv",
+    "difficulty":"medium",
+    "description":"fill later"
   }
 }
