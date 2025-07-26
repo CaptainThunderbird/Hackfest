@@ -1,92 +1,40 @@
+import os
+import json
 import pandas as pd
-from typing import Dict, Optional, List
+from typing import Dict, Optional, Any
 
 class DatasetLoader:
-    def __init__(self):
-        self.datasets = {
-            # MARVEL/AVENGERS
-            "avengers": {
-                "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/avengers/avengers.csv",
-                "difficulty": "easy",
-                "key_columns": ["Name", "Death1", "Gender", "Year"],
-                "quick_tasks": [
-                    "df[df['Gender'] == 'Female'].shape[0]  # Count female characters",
-                    "df.groupby('Year')['Death1'].sum().plot()  # Deaths by year"
-                ]
-            },
-            
-            # MAJORS
-            "majors": {
-                "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/majors-list.csv",
-                "difficulty": "medium",
-                "key_columns": ["Major", "Major_category", "Total"],
-                "quick_tasks": [
-                    "df.nlargest(10, 'Total')  # Top 10 most popular majors",
-                    "df['Major_category'].value_counts().plot.pie()  # Major categories"
-                ]
-            },
-            
-            # LYRICS
-            "lyrics": {
-                "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/hip-hop-candidate-lyrics/genius_hip_hop_lyrics.csv",
-                "difficulty": "medium",
-                "key_columns": ["artist", "album", "candidate", "sentiment"],
-                "quick_tasks": [
-                    "df['candidate'].value_counts().plot(kind='bar')  # Candidate mentions",
-                    "df.groupby('artist')['sentiment'].mean().sort_values()  # Sentiment by artist"
-                ],
-                "preprocessing": """
-# Clean sentiment scores
-df['sentiment'] = pd.to_numeric(df['sentiment'], errors='coerce')"""
-            },
-            
-            # MASCULINITY
-            "masculinity": {
-                "url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/masculinity-survey/masculinity-survey.csv",
-                "difficulty": "hard",
-                "key_columns": ["question", "response", "count", "percentage"],
-                "quick_tasks": [
-                    "df[df['question'].str.contains('important')]  # Filter questions about importance",
-                    "df.pivot(index='question', columns='response', values='count').plot.barh(stacked=True)  # Stacked responses"
-                ],
-                "preprocessing": """
-# Convert percentages to float
-df['percentage'] = df['percentage'].str.rstrip('%').astype('float')"""
-            }
-        }
+    def __init__(self, data_dir: str = "datasets"):
+        self.data_dir = data_dir
+        self.metadata = self._load_metadata()
 
-    def load(self, name: str) -> Optional[pd.DataFrame]:
+    def _load_metadata(self) -> Dict[str, Any]:
+        """Load metadata from metadata.json"""
         try:
-            if name not in self.datasets:
-                raise ValueError(f"Unknown dataset: {name}")
-                
-            df = pd.read_csv(
-                self.datasets[name]["url"],
-                encoding='latin-1',
-                on_bad_lines='warn'
-            )
-            
-            # Apply preprocessing
-            if "preprocessing" in self.datasets[name]:
-                exec(self.datasets[name]["preprocessing"], globals(), {'df': df})
-            
-            # attach metadata
-            df.attrs = {
-                'difficulty': self.datasets[name]["difficulty"],
-                'key_columns': self.datasets[name]["key_columns"],
-                'quick_tasks': self.datasets[name]["quick_tasks"]
-            }
-            
-            return df
-            
-        except Exception as e:
-            print(f"⚠️ Error loading {name}: {str(e)}")
+            with open("metadata.json", "r") as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print(f"Error loading metadata: {e}")
+            return {}
+
+    def load(self, name: str) -> Optional[Dict[str, Any]]:
+        """
+        Load dataset and attach metadata.
+        Returns dictionary with keys: 'data' and 'metadata'
+        """
+        meta = self.metadata.get(name)
+        if not meta:
+            print(f"No metadata found for: {name}")
             return None
 
-    # Helper methods
-    def get_datasets_by_difficulty(self, level: str) -> List[str]:
-        return [name for name, data in self.datasets.items() 
-                if data["difficulty"] == level]
+        file_path = os.path.join(self.data_dir, meta["file"])
+        try:
+            df = pd.read_csv(file_path, encoding="utf-8", on_bad_lines="warn")
+            return {"data": df, "metadata": meta}
+        except FileNotFoundError:
+            print(f"Dataset file not found: {file_path}")
+            return None
 
-    def get_quick_task(self, dataset_name: str, index: int = 0) -> str:
-        return self.datasets.get(dataset_name, {}).get("quick_tasks", [""])[index]
+    def get_metadata(self, name: str) -> Dict[str, Any]:
+        """Return metadata only for a dataset"""
+        return self.metadata.get(name, {})
