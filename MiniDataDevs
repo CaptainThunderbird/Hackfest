@@ -1,10 +1,20 @@
-your-project/
-├── datasets/
-│   ├── cereal.csv
-│   ├── df_arabica.csv(coffee)
-│   ├── indian_food.csv
-│   ├── netflix_titles.csv
-│   ├── women_clothing_ecommerce_sales.csv
-│   └── datasets.json
-├── app.py  # Streamlit/FastAPI
+repo/
+├── .github/              
+├── data/                  
+│   ├── preloaded-datasets/
+│   └── live_searches/ 
+├── notebooks/
+│   └── Datasets.ipynb
+├── src/
+│   ├── __init__.py
+│   ├── chatbot/           # Chatbot module
+│   │   ├── __init__.py
+│   │   ├── core.py        # Response logic
+│   │   └── utils.py       # Helper functions
+│   └── data/
+│       ├── loader.py      # Dataset loading
+│       └── search.py      # Kaggle API wrapper
+├── tests/                 # Unit tests
+├── .gitignore
+├── requirements.txt       # Python dependencies
 └── README.md

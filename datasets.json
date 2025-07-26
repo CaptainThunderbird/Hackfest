@@ -3,29 +3,44 @@
     "file": "cereal.csv",
     "difficulty": "easy",
     "description": "fill later",
-    "colab_link": "https://colab.research.google.com/..."
+    "colab_link": "https://colab.research.google.com/...",
+    "Steps": [
+      "Write steps to working with this data set"
+    ]
   },
   "coffee": {
     "file": "df_arabica_clean.csv",
     "difficulty": "medium",
     "description": "fill later",
-    "colab_link": "https://colab.research.google.com/..."
+    "colab_link": "https://colab.research.google.com/...",
+    "Steps": [
+      "Write steps to working with this data set"
+    ]
   },
   "food": {
   "file": "indian_food.csv",
   "difficulty":"fill later",
-  "colab_link":""
+  "colab_link":"",
+  "Steps": [
+      "Write steps to working with this data set"
+    ]
 
 
   },
   "cinema": {
     "file": "netflix_titles.csv",
     "difficulty":"fill later",
-    "colab_link":""
+    "colab_link":"",
+    "Steps": [
+      "Write steps to working with this data set"
+    ]
   },
   "clothes": {
     "file": "women_clothing_ecommerce_sales.csv",
     "difficulty":"fill later",
-    "colab_link":""
+    "colab_link":"",
+    "Steps": [
+      "Write steps to working with this data set"
+    ]
   }
 }
