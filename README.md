@@ -1,9 +1,33 @@
-# Hackfest
+# MiniDataDev 📊💬
 
-If you are looking to use AI to guide your contribution to the project, here is a prompt:
+MiniDataDev is an intuitive, Python-based data analysis tool designed to make data exploration effortless. Combining a responsive **Streamlit UI** with an **integrated AI chatbot**, MiniDataDev allows users to upload datasets, generate instant visualizations, and ask conversational questions directly about their data.
 
-I have 16 hrs left in a hackathon competition and I need to finish this project.
-What's left? Tipps for navigating data, interactive GUI, auto generated starter code, AI, and Demo. The project is a data set practive tool for beginner developers looking to sharpen their data skills. There should be 4 preloaded data sets and an AI chatbot that searches for live data sets. The practice is based in google collab/jupyter. I have a loader.py file needing debugging for mismatched key, I need to attach the meta data.
-I am working in vscode on a mac. I have kaggle.json, loader.py, analysis.ipynb, requirements.txt, and core.py, __init__.py.
+---
 
-# Customize parts of the prompt to focus on your specific IDE, computer type, and what file you want to work on
+## 🚀 Features
+
+- **Conversational Data Querying:** An integrated chatbot that interprets natural language questions and extracts insights or summaries from your datasets.
+- **Interactive Dashboard:** Built with Streamlit for a clean, user-friendly interface that updates dynamically.
+- **Automated Visualizations:** Easily generate charts, plots, and statistical metrics without writing code.
+- **Seamless File Upload:** Supports popular data formats (like CSV and Excel) for quick, on-the-fly analysis.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Backend/Logic:** Python
+- **User Interface:** Streamlit
+- **Data Manipulation:** Pandas, NumPy
+- **Data Visualization:** Matplotlib / Seaborn / Plotly *(adjust based on your actual libraries)*
+- **Chatbot Integration:** *(e.g., OpenAI API / LangChain / Google Gemini API - customize as needed)*
+
+---
+
+## 📦 Installation & Setup
+
+Follow these steps to get your local development environment up and running:
+
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/CaptainThunderbird/MiniDataDev.git](https://github.com/CaptainThunderbird/MiniDataDev.git)
+cd MiniDataDev
