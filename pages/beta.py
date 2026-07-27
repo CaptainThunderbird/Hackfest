@@ -4,13 +4,10 @@ import streamlit as st
 
 from minidatadev.analysis import profile_dataframe
 from minidatadev.config import get_settings
-from minidatadev.projects import (
-    ProjectStore,
-    export_csv,
-    export_report,
-    health_snapshot,
-    set_active_dataset,
-)
+from minidatadev.projects.exports import export_csv, export_report
+from minidatadev.projects.monitoring import health_snapshot
+from minidatadev.projects.sessions import set_active_dataset
+from minidatadev.projects.storage import ProjectStore
 
 
 def render() -> None:

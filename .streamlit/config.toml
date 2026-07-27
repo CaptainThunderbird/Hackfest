@@ -12,3 +12,8 @@ headless = true
 
 [browser]
 gatherUsageStats = false
+
+[client]
+# MiniDataDev uses its own product navigation in app.py. The files in pages/
+# are render modules, not independent Streamlit entry points.
+showSidebarNavigation = false

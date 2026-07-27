@@ -11,7 +11,7 @@ from minidatadev.ai import (
 from minidatadev.analysis import explain_chart, suggest_questions
 from minidatadev.analysis.operations import AnalysisValidationError
 from minidatadev.config import get_settings
-from minidatadev.projects import RateLimiter, record_event
+from minidatadev.projects.monitoring import RateLimiter, record_event
 
 
 def render() -> None:
