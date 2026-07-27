@@ -4,7 +4,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from dotenv import load_dotenv
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 
 class Settings(BaseModel):
@@ -16,6 +16,9 @@ class Settings(BaseModel):
     data_dir: Path = Field(default=Path(".minidatadev/data"))
     database_path: Path = Field(default=Path(".minidatadev/minidatadev.sqlite3"))
     max_upload_mb: int = Field(default=100, gt=0)
+    ai_provider: str = Field(default="demo")
+    ai_model: str = Field(default="gpt-5.6")
+    openai_api_key: SecretStr | None = None
 
 
 @lru_cache
@@ -35,4 +38,11 @@ def get_settings() -> Settings:
             )
         ),
         max_upload_mb=int(os.getenv("MINIDATADEV_MAX_UPLOAD_MB", "100")),
+        ai_provider=os.getenv("MINIDATADEV_AI_PROVIDER", "demo"),
+        ai_model=os.getenv("MINIDATADEV_AI_MODEL", "gpt-5.6"),
+        openai_api_key=(
+            SecretStr(os.environ["OPENAI_API_KEY"])
+            if os.getenv("OPENAI_API_KEY")
+            else None
+        ),
     )

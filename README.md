@@ -5,8 +5,8 @@ version will let users upload CSV or Excel data, inspect automatic profiles and
 charts, ask analytical questions conversationally, verify the calculations
 behind each answer, and export results.
 
-This branch contains the Phase 0 repository foundation. The Streamlit product
-shell and chatbot arrive in later roadmap phases.
+The current product includes the Phase 1 Streamlit workspace and the Phase 2
+schema-aware chatbot foundation.
 
 ## Technology
 
@@ -54,7 +54,13 @@ shell and chatbot arrive in later roadmap phases.
 
 4. Copy `.env.example` to `.env` and adjust local settings if needed.
 
-5. Run the checks:
+5. Start the app:
+
+   ```bash
+   streamlit run app.py
+   ```
+
+6. Run the checks:
 
    ```bash
    ruff check .
@@ -72,6 +78,17 @@ src/minidatadev/
 └── config.py    # environment-backed configuration
 ```
 
+## Product capabilities
+
+- Upload and validate CSV, XLS, and XLSX files
+- Load bundled or public sample datasets
+- Preview data and inspect row, column, duplicate, and completeness metrics
+- Explore automatic type and missing-value visualizations
+- Retain the active dataset and conversation context within the session
+- Stream schema-grounded answers through a provider-neutral assistant
+- Use the offline demo assistant without credentials
+- Optionally use OpenAI through the Responses API
+
 The single supported data-loading API is:
 
 ```python
@@ -85,6 +102,23 @@ Uploaded file objects can be loaded with
 `loader.load(upload, filename=upload.name)`. Registered sample data can be
 loaded by name, for example `loader.load("avengers")`.
 
+## Assistant configuration
+
+The app starts in `demo` mode and requires no API key. Demo mode answers
+questions about dataset shape, columns, and missing values.
+
+To enable OpenAI, set these values in your uncommitted `.env`:
+
+```dotenv
+MINIDATADEV_AI_PROVIDER=openai
+MINIDATADEV_AI_MODEL=gpt-5.6
+OPENAI_API_KEY=your-local-key
+```
+
+The provider receives a bounded JSON context containing schema, profile,
+three preview rows, and established conversation definitions. It does not
+receive a dataframe object and cannot execute generated Python.
+
 ## Secrets
 
 Never commit API keys or provider credential files. Local `.env`,
@@ -96,9 +130,9 @@ account settings.
 
 ## Roadmap
 
-- Phase 0: repository rescue and reliable foundation
-- Phase 1: Streamlit product shell, upload, preview, and profiling
-- Phase 2: provider-neutral conversational assistant
+- Phase 0: repository rescue and reliable foundation — complete
+- Phase 1: Streamlit product shell, upload, preview, and profiling — complete
+- Phase 2: provider-neutral conversational assistant — complete
 - Phase 3: controlled, validated analysis tools and provenance
 - Phase 4: automated visualizations and insights
 - Phase 5: correctness, safety, latency, and cost evaluation

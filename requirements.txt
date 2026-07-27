@@ -1,6 +1,7 @@
 # Runtime dependencies used by deployment platforms.
 # For local development, prefer: pip install -e ".[dev]"
 duckdb>=1.0,<2
+openai>=2.0,<3
 openpyxl>=3.1,<4
 pandas>=2.2,<3
 plotly>=5.22,<7
