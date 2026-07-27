@@ -6,7 +6,7 @@ charts, ask analytical questions conversationally, verify the calculations
 behind each answer, and export results.
 
 The current product includes the Streamlit workspace, schema-aware chatbot,
-and Phase 3 controlled analysis tools.
+controlled analysis tools, and automated insight and visualization workflows.
 
 ## Technology
 
@@ -89,6 +89,10 @@ src/minidatadev/
 - Filter, sort, aggregate, correlate, compare periods, and find outliers
 - Generate verified Plotly charts through conversation
 - Inspect the approved tool, parameters, assumptions, and calculation steps
+- Review automatic quality, distribution, relationship, and structure insights
+- Start from type-aware chart recommendations and edit every chart setting
+- Ask Chat to explain the active chart using bounded plotted context
+- Save observations and chart insights within the active dataset session
 - Use the offline demo assistant without credentials
 - Optionally use OpenAI through the Responses API
 
@@ -146,6 +150,25 @@ phrasing. Model-proposed arguments remain untrusted and pass through the same
 local validation before execution. Arbitrary Python, SQL, and shell execution
 are not available.
 
+## Automated insights and visualizations
+
+The Dashboard derives observations deterministically from the dataset profile
+and calculated statistics. Every observation includes evidence and, where
+useful, an answerable suggested question.
+
+The chart studio recommends visualizations based on detected column roles:
+
+- category plus number → aggregated bar chart
+- date plus number → time-series line chart
+- two numbers → scatter plot
+- one number → histogram and box plot
+- category → record-count bar chart
+
+Users can change chart type, axes, grouping, aggregation, and title. The active
+chart publishes a bounded context containing its configuration, plotted row
+count, small preview, and calculated high/low points. “Explain this chart”
+answers use only that context.
+
 ## Secrets
 
 Never commit API keys or provider credential files. Local `.env`,
@@ -161,6 +184,6 @@ account settings.
 - Phase 1: Streamlit product shell, upload, preview, and profiling — complete
 - Phase 2: provider-neutral conversational assistant — complete
 - Phase 3: controlled, validated analysis tools and provenance — complete
-- Phase 4: automated visualizations and insights
+- Phase 4: automated visualizations and insights — complete
 - Phase 5: correctness, safety, latency, and cost evaluation
 - Phase 6: persistent beta product and deployment

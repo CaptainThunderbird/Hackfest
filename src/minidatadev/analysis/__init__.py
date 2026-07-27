@@ -1,5 +1,6 @@
 """Dataset profiling APIs."""
 
+from minidatadev.analysis.insights import Insight, generate_insights, suggest_questions
 from minidatadev.analysis.profiling import (
     ColumnProfile,
     DatasetProfile,
@@ -18,11 +19,19 @@ from minidatadev.analysis.validation import (
     OutlierRequest,
     SortRequest,
 )
+from minidatadev.analysis.visualizations import (
+    ChartRecommendation,
+    build_chart,
+    explain_chart,
+    recommend_charts,
+)
 
 __all__ = [
     "ColumnProfile",
     "DatasetProfile",
     "AnalysisResult",
+    "ChartRecommendation",
+    "Insight",
     "AggregationRequest",
     "ChartRequest",
     "CorrelationRequest",
@@ -34,4 +43,9 @@ __all__ = [
     "SortRequest",
     "profile_dataframe",
     "profile_table",
+    "build_chart",
+    "explain_chart",
+    "generate_insights",
+    "recommend_charts",
+    "suggest_questions",
 ]

@@ -95,6 +95,8 @@ with st.sidebar:
         st.caption("ACTIVE DATASET")
         st.markdown(f"**{st.session_state.active_dataset_name}**")
         st.caption(f"{profile.rows:,} rows · {profile.columns:,} columns")
+        if st.session_state.saved_insights:
+            st.caption(f"{len(st.session_state.saved_insights)} saved insights")
     else:
         st.caption("Load a dataset to begin.")
     st.markdown("")

@@ -8,6 +8,7 @@ from minidatadev.ai import (
     DemoProvider,
     OpenAIProvider,
 )
+from minidatadev.analysis import explain_chart, suggest_questions
 from minidatadev.analysis.operations import AnalysisValidationError
 from minidatadev.config import get_settings
 
@@ -20,7 +21,7 @@ def render() -> None:
     )
     st.markdown(
         '<p class="mdd-subtitle">Explore the schema, clarify definitions, and '
-        "run verified calculations, and inspect exactly how each answer was "
+        "run verified calculations while inspecting exactly how each answer was "
         "produced.</p>",
         unsafe_allow_html=True,
     )
@@ -105,14 +106,40 @@ def _answer(question: str, provider) -> None:
         "current_filters": st.session_state.current_filters,
         "definitions": st.session_state.definitions,
         "assumptions": st.session_state.assumptions,
+        "active_chart_context": st.session_state.active_chart_context,
     }
     with st.chat_message("assistant"):
         try:
-            result = assistant.analyze(
-                frame=st.session_state.active_dataset,
-                question=question,
-            )
-            if result is not None:
+            chart_explained = False
+            if (
+                _is_chart_explanation(question)
+                and st.session_state.active_chart_context
+            ):
+                chart_explained = True
+                result = None
+                answer = explain_chart(st.session_state.active_chart_context)
+                artifact = {
+                    "tool_name": "explain_chart",
+                    "table": None,
+                    "chart": st.session_state.active_chart,
+                    "provenance": [
+                        "Used the active chart configuration.",
+                        "Read only calculated chart context and plotted values.",
+                        "Generated no claims beyond the bounded chart context.",
+                    ],
+                    "assumptions": [],
+                    "parameters": st.session_state.active_chart_context,
+                }
+                st.markdown(answer)
+                _render_artifact(artifact)
+            else:
+                result = assistant.analyze(
+                    frame=st.session_state.active_dataset,
+                    question=question,
+                )
+            if chart_explained:
+                pass
+            elif result is not None:
                 answer = result.summary
                 artifact = result.artifact()
                 st.markdown(answer)
@@ -186,34 +213,14 @@ def _render_artifact(artifact) -> None:
 
 def _suggestions() -> list[str]:
     profile = st.session_state.dataset_profile
-    numeric = [
-        item.name for item in profile.column_profiles if item.kind == "number"
-    ]
-    groups = [
-        item.name
-        for item in profile.column_profiles
-        if item.kind in {"category", "text"}
-    ]
-    suggestions = [
-        "Which columns are available?",
-        "Where are values missing?",
-    ]
-    if numeric and groups:
-        suggestions.extend(
-            [
-                f"Show total {numeric[0]} by {groups[0]}",
-                f"Create a bar chart of total {numeric[0]} by {groups[0]}",
-            ]
-        )
-    elif len(numeric) >= 2:
-        suggestions.extend(
-            [
-                f"Calculate correlation between {numeric[0]} and {numeric[1]}",
-                f"Find outliers in {numeric[0]}",
-            ]
-        )
-    else:
-        suggestions.extend(
-            ["How many rows are in this dataset?", "Preview sample rows"]
-        )
-    return suggestions
+    suggestions = list(suggest_questions(profile, limit=4))
+    if st.session_state.active_chart_context:
+        suggestions.insert(0, "Explain this chart")
+    return suggestions[:4]
+
+
+def _is_chart_explanation(question: str) -> bool:
+    normalized = question.casefold()
+    return "explain" in normalized and any(
+        term in normalized for term in ("chart", "graph", "plot", "visual")
+    )

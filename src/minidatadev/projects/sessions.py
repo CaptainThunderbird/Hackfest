@@ -10,6 +10,11 @@ DEFAULT_SESSION = {
     "chat_messages": [],
     "current_filters": [],
     "saved_charts": [],
+    "saved_insights": [],
+    "active_chart_context": None,
+    "active_chart": None,
+    "active_chart_data": None,
+    "chart_signature": None,
     "definitions": {},
     "assumptions": [],
     "usage": {"input_tokens": 0, "output_tokens": 0, "requests": 0},
@@ -39,5 +44,24 @@ def set_active_dataset(
     state["chat_messages"] = []
     state["current_filters"] = []
     state["saved_charts"] = []
+    state["saved_insights"] = []
+    state["active_chart_context"] = None
+    state["active_chart"] = None
+    state["active_chart_data"] = None
+    state["chart_signature"] = None
     state["definitions"] = {}
     state["assumptions"] = []
+
+
+def save_insight(
+    state: MutableMapping[str, Any],
+    insight: dict[str, Any],
+) -> bool:
+    """Save a dataset insight once and report whether it was newly added."""
+
+    saved = state["saved_insights"]
+    identifier = insight["id"]
+    if any(item["id"] == identifier for item in saved):
+        return False
+    saved.append(insight)
+    return True

@@ -45,6 +45,7 @@ def build_dataset_context(
             "filters": context.get("current_filters", []),
             "definitions": context.get("definitions", {}),
             "assumptions": context.get("assumptions", []),
+            "active_chart": context.get("active_chart_context"),
         },
     }
     return json.dumps(payload, ensure_ascii=True, default=str)
