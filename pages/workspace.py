@@ -10,6 +10,13 @@ from minidatadev.projects import set_active_dataset
 
 
 def render() -> None:
+    if not st.session_state.onboarding_complete:
+        with st.expander("Welcome — three steps to your first answer", expanded=True):
+            st.markdown(
+                "1. Upload a CSV or Excel file (or choose the sample).\n"
+                "2. Review automatic insights in **Dashboard**.\n"
+                "3. Ask a question in **Ask Mini**, then save or export your work."
+            )
     st.markdown('<div class="mdd-eyebrow">Data workspace</div>', unsafe_allow_html=True)
     st.markdown(
         '<h1 class="mdd-title">Start with data you can trust.</h1>',
@@ -78,6 +85,7 @@ def _load_source(
             name=display_name or frame.attrs.get("source_name", filename or "Dataset"),
             profile=profile,
         )
+        st.session_state.onboarding_complete = True
         st.success("Dataset loaded and profiled.")
     except DatasetLoadError as error:
         st.error(str(error))

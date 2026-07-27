@@ -18,6 +18,10 @@ DEFAULT_SESSION = {
     "definitions": {},
     "assumptions": [],
     "usage": {"input_tokens": 0, "output_tokens": 0, "requests": 0},
+    "owner_name": "Local user",
+    "active_project_id": None,
+    "onboarding_complete": False,
+    "request_limiter": None,
 }
 
 
@@ -51,6 +55,7 @@ def set_active_dataset(
     state["chart_signature"] = None
     state["definitions"] = {}
     state["assumptions"] = []
+    state["active_project_id"] = None
 
 
 def save_insight(

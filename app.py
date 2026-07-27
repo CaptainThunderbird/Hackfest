@@ -3,7 +3,7 @@
 import streamlit as st
 
 from minidatadev.projects import initialize_session
-from pages import chat, dashboard, workspace
+from pages import beta, chat, dashboard, workspace
 
 st.set_page_config(
     page_title="MiniDataDev",
@@ -86,7 +86,7 @@ with st.sidebar:
     )
     page = st.radio(
         "Workspace navigation",
-        ["Data workspace", "Dashboard", "Ask Mini"],
+        ["Data workspace", "Dashboard", "Ask Mini", "Projects & export"],
         label_visibility="collapsed",
     )
     st.divider()
@@ -106,5 +106,7 @@ if page == "Data workspace":
     workspace.render()
 elif page == "Dashboard":
     dashboard.render()
-else:
+elif page == "Ask Mini":
     chat.render()
+else:
+    beta.render()

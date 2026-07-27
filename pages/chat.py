@@ -11,6 +11,7 @@ from minidatadev.ai import (
 from minidatadev.analysis import explain_chart, suggest_questions
 from minidatadev.analysis.operations import AnalysisValidationError
 from minidatadev.config import get_settings
+from minidatadev.projects import RateLimiter, record_event
 
 
 def render() -> None:
@@ -93,6 +94,17 @@ def _provider_controls():
 
 
 def _answer(question: str, provider) -> None:
+    settings = get_settings()
+    if st.session_state.request_limiter is None:
+        st.session_state.request_limiter = RateLimiter(settings.requests_per_hour)
+    if not st.session_state.request_limiter.allow():
+        st.warning("Hourly assistant limit reached. Try again after it resets.")
+        return
+    record_event(
+        settings.log_path,
+        "assistant_request",
+        provider=type(provider).__name__,
+    )
     st.session_state.chat_messages.append({"role": "user", "content": question})
     with st.chat_message("user"):
         st.markdown(question)

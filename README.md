@@ -93,6 +93,10 @@ src/minidatadev/
 - Start from type-aware chart recommendations and edit every chart setting
 - Ask Chat to explain the active chart using bounded plotted context
 - Save observations and chart insights within the active dataset session
+- Save and reopen local projects and their conversations
+- Export cleaned CSV data or a portable HTML analysis package
+- Apply configurable retention, deletion, and assistant usage limits
+- Inspect local service health and structured operational event logs
 - Use the offline demo assistant without credentials
 - Optionally use OpenAI through the Responses API
 
@@ -213,6 +217,21 @@ An exposed Kaggle credential was removed during Phase 0. Repository removal
 does not revoke that key: its owner must revoke or rotate it from the Kaggle
 account settings.
 
+## Beta persistence and deployment
+
+Phase 6 adds a local profile and SQLite project store. A profile name separates
+projects on a shared installation; it is not production authentication. Saved
+dataset copies, conversations, and event logs live under `.minidatadev/` and
+are excluded from Git.
+
+The **Projects & export** page supports project save/open/delete, retention
+cleanup, cleaned CSV downloads, and ZIP analysis reports. See `PRIVACY.md`
+before deploying with real user data.
+
+`Dockerfile` and `render.yaml` provide a deployable beta configuration with a
+persistent disk and Streamlit health check. Set `OPENAI_API_KEY` in the host's
+secret manager, never in the repository.
+
 ## Roadmap
 
 - Phase 0: repository rescue and reliable foundation — complete
@@ -221,4 +240,4 @@ account settings.
 - Phase 3: controlled, validated analysis tools and provenance — complete
 - Phase 4: automated visualizations and insights — complete
 - Phase 5: correctness, safety, latency, and cost evaluation — complete
-- Phase 6: persistent beta product and deployment
+- Phase 6: persistent beta product and deployment — complete

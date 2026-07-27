@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: minidatadev
+    runtime: docker
+    healthCheckPath: /_stcore/health
+    disk:
+      name: minidatadev-data
+      mountPath: /app/.minidatadev
+      sizeGB: 1
+    envVars:
+      - key: MINIDATADEV_ENV
+        value: production
+      - key: MINIDATADEV_DATABASE_PATH
+        value: /app/.minidatadev/minidatadev.sqlite3
+      - key: MINIDATADEV_DATA_DIR
+        value: /app/.minidatadev/data
+      - key: OPENAI_API_KEY
+        sync: false

@@ -19,6 +19,9 @@ class Settings(BaseModel):
     ai_provider: str = Field(default="demo")
     ai_model: str = Field(default="gpt-5.6")
     openai_api_key: SecretStr | None = None
+    retention_days: int = Field(default=30, gt=0)
+    requests_per_hour: int = Field(default=30, gt=0)
+    log_path: Path = Field(default=Path(".minidatadev/events.jsonl"))
 
 
 @lru_cache
@@ -45,4 +48,7 @@ def get_settings() -> Settings:
             if os.getenv("OPENAI_API_KEY")
             else None
         ),
+        retention_days=int(os.getenv("MINIDATADEV_RETENTION_DAYS", "30")),
+        requests_per_hour=int(os.getenv("MINIDATADEV_REQUESTS_PER_HOUR", "30")),
+        log_path=Path(os.getenv("MINIDATADEV_LOG_PATH", ".minidatadev/events.jsonl")),
     )
