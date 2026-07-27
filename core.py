@@ -1,6 +1,3 @@
-from typing import Dict
-import pandas as pd
-
 class DatasetAssistant:
     def __init__(self, loader):
         self.loader = loader  # DatasetLoader instance
@@ -17,7 +14,7 @@ class DatasetAssistant:
             }
         }
 
-    def respond(self, query: str) -> Dict:
+    def respond(self, query: str) -> dict:
         """Process user queries and return project instructions"""
         query = query.lower()
         

@@ -1,33 +1,105 @@
-# MiniDataDev 
+# MiniDataDev
 
-MiniDataDev is an intuitive, Python-based data analysis tool designed to make data exploration effortless. Combining a responsive **Streamlit UI** with an **integrated AI chatbot**, MiniDataDev allows users to upload datasets, generate instant visualizations, and ask conversational questions directly about their data.
+MiniDataDev is becoming an AI-assisted data-analysis workspace. The first full
+version will let users upload CSV or Excel data, inspect automatic profiles and
+charts, ask analytical questions conversationally, verify the calculations
+behind each answer, and export results.
 
----
+This branch contains the Phase 0 repository foundation. The Streamlit product
+shell and chatbot arrive in later roadmap phases.
 
-## Features
+## Technology
 
-- **Conversational Data Querying:** An integrated chatbot that interprets natural language questions and extracts insights or summaries from your datasets.
-- **Interactive Dashboard:** Built with Streamlit for a clean, user-friendly interface that updates dynamically.
-- **Automated Visualizations:** Easily generate charts, plots, and statistical metrics without writing code.
-- **Seamless File Upload:** Supports popular data formats (like CSV and Excel) for quick, on-the-fly analysis.
+- Python 3.11+
+- Streamlit
+- Pandas, with DuckDB available for larger datasets
+- Plotly
+- Pydantic
+- Local files and SQLite for initial persistence
+- Pytest and Ruff for automated checks
 
----
+## Local setup
 
-## Tech Stack
+1. Clone the repository and enter it:
 
-- **Backend/Logic:** Python
-- **User Interface:** Streamlit
-- **Data Manipulation:** Pandas, NumPy
-- **Data Visualization:** Matplotlib / Seaborn / Plotly *(adjust based on your actual libraries)*
-- **Chatbot Integration:** *(e.g., OpenAI API / LangChain / Google Gemini API - customize as needed)*
+   ```bash
+   git clone https://github.com/CaptainThunderbird/MiniDataDev.git
+   cd MiniDataDev
+   ```
 
----
+2. Create and activate a virtual environment:
 
-## Installation & Setup
+   ```bash
+   python -m venv .venv
+   ```
 
-Follow these steps to get your local development environment up and running:
+   On macOS or Linux:
 
-### 1. Clone the Repository
-```bash
-git clone [https://github.com/CaptainThunderbird/MiniDataDev.git](https://github.com/CaptainThunderbird/MiniDataDev.git)
-cd MiniDataDev
+   ```bash
+   source .venv/bin/activate
+   ```
+
+   On Windows PowerShell:
+
+   ```powershell
+   .venv\Scripts\Activate.ps1
+   ```
+
+3. Install the package and development tools:
+
+   ```bash
+   python -m pip install --upgrade pip
+   python -m pip install -e ".[dev]"
+   ```
+
+4. Copy `.env.example` to `.env` and adjust local settings if needed.
+
+5. Run the checks:
+
+   ```bash
+   ruff check .
+   pytest
+   ```
+
+## Package layout
+
+```text
+src/minidatadev/
+├── ai/          # provider and chatbot integration (later phases)
+├── analysis/    # validated calculations and charts (later phases)
+├── data/        # CSV/Excel loading and sample registry
+├── projects/    # projects and conversation state (later phases)
+└── config.py    # environment-backed configuration
+```
+
+The single supported data-loading API is:
+
+```python
+from minidatadev.data import DatasetLoader
+
+loader = DatasetLoader()
+frame = loader.load("path/to/data.csv")
+```
+
+Uploaded file objects can be loaded with
+`loader.load(upload, filename=upload.name)`. Registered sample data can be
+loaded by name, for example `loader.load("avengers")`.
+
+## Secrets
+
+Never commit API keys or provider credential files. Local `.env`,
+`kaggle.json`, and Streamlit secrets are ignored.
+
+An exposed Kaggle credential was removed during Phase 0. Repository removal
+does not revoke that key: its owner must revoke or rotate it from the Kaggle
+account settings.
+
+## Roadmap
+
+- Phase 0: repository rescue and reliable foundation
+- Phase 1: Streamlit product shell, upload, preview, and profiling
+- Phase 2: provider-neutral conversational assistant
+- Phase 3: controlled, validated analysis tools and provenance
+- Phase 4: automated visualizations and insights
+- Phase 5: correctness, safety, latency, and cost evaluation
+- Phase 6: persistent beta product and deployment

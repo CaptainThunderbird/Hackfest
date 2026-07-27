@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "minidatadev"
+version = "0.1.0"
+description = "An AI-assisted data-analysis workspace"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "duckdb>=1.0,<2",
+    "openpyxl>=3.1,<4",
+    "pandas>=2.2,<3",
+    "plotly>=5.22,<7",
+    "pydantic>=2.7,<3",
+    "python-dotenv>=1.0,<2",
+    "streamlit>=1.36,<2",
+    "xlrd>=2.0,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2,<9",
+    "pytest-cov>=5,<7",
+    "ruff>=0.5,<1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+
+[tool.ruff]
+extend-exclude = ["analysis.ipynb"]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
