@@ -1,5 +1,7 @@
 """Safe, consolidated CSV and Excel dataset ingestion."""
 
+import csv
+from io import StringIO
 from pathlib import Path
 from typing import BinaryIO
 
@@ -95,9 +97,50 @@ class DatasetLoader:
 
     @staticmethod
     def _read_csv(source: DataSource) -> pd.DataFrame:
+        _validate_csv_shape(source)
         try:
             return pd.read_csv(source, encoding="utf-8", on_bad_lines="error")
         except UnicodeDecodeError:
             if hasattr(source, "seek"):
                 source.seek(0)
             return pd.read_csv(source, encoding="latin-1", on_bad_lines="error")
+
+
+def _validate_csv_shape(source: DataSource) -> None:
+    """Reject inconsistent field counts before Pandas can infer an index."""
+
+    if isinstance(source, str) and source.startswith(("http://", "https://")):
+        return
+    raw: bytes | None = None
+    if hasattr(source, "read"):
+        source.seek(0)
+        raw = source.read()
+        source.seek(0)
+        if isinstance(raw, str):
+            raw = raw.encode()
+    elif isinstance(source, (str, Path)):
+        raw = Path(source).read_bytes()
+    if raw is None:
+        return
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        text = raw.decode("latin-1")
+    rows = [
+        row
+        for row in csv.reader(StringIO(text))
+        if row and any(value.strip() for value in row)
+    ]
+    if not rows:
+        return
+    expected = len(rows[0])
+    invalid = [
+        index
+        for index, row in enumerate(rows[1:], start=2)
+        if len(row) != expected
+    ]
+    if invalid:
+        locations = ", ".join(str(index) for index in invalid[:5])
+        raise DatasetLoadError(
+            f"CSV rows have inconsistent field counts at line(s): {locations}."
+        )

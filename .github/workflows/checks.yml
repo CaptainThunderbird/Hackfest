@@ -23,3 +23,12 @@ jobs:
         run: ruff check .
       - name: Test
         run: pytest --cov=minidatadev --cov-report=term-missing
+      - name: Reliability evaluation
+        run: >-
+          python -m minidatadev.evaluation.runner
+          --output reports/evaluation.json
+          --minimum-pass-rate 1.0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reliability-report
+          path: reports/evaluation.json

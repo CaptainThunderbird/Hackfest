@@ -25,6 +25,7 @@ from minidatadev.analysis.validation import (
     CorrelationRequest,
     DateComparisonRequest,
     DescribeColumnRequest,
+    FilterCondition,
     FilterRequest,
     OutlierRequest,
     SortRequest,
@@ -92,6 +93,27 @@ class AnalysisPlanner:
             if pd.api.types.is_numeric_dtype(frame[column])
         ]
         non_numeric = [column for column in mentioned if column not in numeric]
+
+        filter_intent = any(
+            term in normalized
+            for term in ("where", "with", "have", "has", "match", "only")
+        )
+        if filter_intent:
+            matched = _matched_category_value(frame, mentioned, normalized)
+            if matched:
+                column, value = matched
+                return filter_data(
+                    frame,
+                    FilterRequest(
+                        conditions=(
+                            FilterCondition(
+                                column=str(column),
+                                operator="eq",
+                                value=value,
+                            ),
+                        )
+                    ),
+                )
 
         if any(
             term in normalized
@@ -280,6 +302,23 @@ def _mentioned_columns(frame: pd.DataFrame, normalized_question: str) -> list[st
     return matches
 
 
+def _matched_category_value(
+    frame: pd.DataFrame,
+    columns: list[str],
+    normalized_question: str,
+) -> tuple[str, object] | None:
+    padded = f" {normalized_question} "
+    for column in columns:
+        series = frame[column].dropna()
+        if pd.api.types.is_numeric_dtype(series) or series.nunique() > 100:
+            continue
+        for value in series.drop_duplicates():
+            normalized_value = _normalize(str(value))
+            if normalized_value and f" {normalized_value} " in padded:
+                return str(column), value
+    return None
+
+
 def _choose_metric(
     numeric: list[str],
     question: str,
@@ -294,7 +333,11 @@ def _choose_group(
     metric: str | None,
     question: str,
 ) -> str | None:
-    if " by " not in f" {question} ":
+    grouped_ranking = any(
+        term in question
+        for term in ("which", "highest", "lowest", "largest", "smallest")
+    )
+    if " by " not in f" {question} " and not grouped_ranking:
         return None
     return next((column for column in mentioned if column != metric), None)
 

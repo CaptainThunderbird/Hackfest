@@ -20,6 +20,9 @@ dependencies = [
     "xlrd>=2.0,<3",
 ]
 
+[project.scripts]
+minidatadev-evaluate = "minidatadev.evaluation.runner:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.2,<9",

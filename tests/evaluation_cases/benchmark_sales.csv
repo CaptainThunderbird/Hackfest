@@ -1,0 +1,9 @@
+order_date,category,region,revenue,cost,units,notes
+2024-01-15,A,North,100,60,10,launch
+2024-02-15,A,South,120,72,12,
+2024-03-15,B,North,200,130,20,strong
+2024-04-15,B,South,180,117,18,
+2025-01-15,A,North,80,52,8,decline
+2025-02-15,A,South,90,58,9,
+2025-03-15,B,North,240,156,24,strong
+2025-04-15,B,South,220,143,22,

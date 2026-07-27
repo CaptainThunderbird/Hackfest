@@ -169,6 +169,41 @@ chart publishes a bounded context containing its configuration, plotted row
 count, small preview, and calculated high/low points. “Explain this chart”
 answers use only that context.
 
+## Reliability evaluation
+
+Phase 5 includes a versioned benchmark dataset and ten evaluation cases
+covering:
+
+- numerical correctness
+- condition-based record counts
+- date-period comparisons
+- correlation and missing-value questions
+- chart type and aggregated values
+- nonexistent columns and ambiguous requests
+- prompt-injection attempts
+- malformed CSV recovery
+
+Run the suite locally:
+
+```bash
+python -m minidatadev.evaluation.runner \
+  --output reports/evaluation.json \
+  --minimum-pass-rate 1.0
+```
+
+The JSON report records pass rate, numerical and tool-selection accuracy,
+chart correctness, unsupported-claim rate, recovery and safety rates, average
+and p95 latency, token totals, and estimated cost. Cost remains `null` unless
+current provider prices are explicitly supplied through:
+
+```dotenv
+MINIDATADEV_INPUT_PRICE_PER_MILLION=
+MINIDATADEV_OUTPUT_PRICE_PER_MILLION=
+```
+
+CI runs the same suite and uploads `reports/evaluation.json` as a build
+artifact. The benchmark is offline-first and does not spend API credits.
+
 ## Secrets
 
 Never commit API keys or provider credential files. Local `.env`,
@@ -185,5 +220,5 @@ account settings.
 - Phase 2: provider-neutral conversational assistant — complete
 - Phase 3: controlled, validated analysis tools and provenance — complete
 - Phase 4: automated visualizations and insights — complete
-- Phase 5: correctness, safety, latency, and cost evaluation
+- Phase 5: correctness, safety, latency, and cost evaluation — complete
 - Phase 6: persistent beta product and deployment
