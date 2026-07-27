@@ -1,9 +1,10 @@
 """Provider-neutral streaming clients."""
 
-from collections.abc import Iterable, Iterator
-from typing import Protocol
+import json
+from collections.abc import Iterable, Iterator, Sequence
+from typing import Protocol, runtime_checkable
 
-from minidatadev.ai.models import ChatMessage, Usage
+from minidatadev.ai.models import ChatMessage, ToolCall, Usage
 
 
 class ChatProvider(Protocol):
@@ -23,6 +24,19 @@ class ChatProvider(Protocol):
     @property
     def last_usage(self) -> Usage:
         """Return usage from the most recent request."""
+
+
+@runtime_checkable
+class ToolPlanningProvider(Protocol):
+    """Optional capability for model-selected validated tool calls."""
+
+    def plan_tool(
+        self,
+        *,
+        question: str,
+        columns: Sequence[dict[str, str]],
+    ) -> ToolCall | None:
+        """Return one proposed tool call or None when clarification is needed."""
 
 
 class DemoProvider:
@@ -68,9 +82,8 @@ class DemoProvider:
         else:
             answer = (
                 "I can currently explain the dataset structure, column types, sample "
-                "values, and missing data. Verified calculations such as grouped "
-                "totals and period comparisons arrive with the controlled analysis "
-                "tools in Phase 3. Try asking **Which columns are available?**"
+                "values, and missing data. For calculations, name the exact metric "
+                "and grouping column—for example, **Show total sales by region**."
             )
         yield from _chunk(answer)
 
@@ -126,6 +139,65 @@ class OpenAIProvider:
                     output_tokens=int(getattr(usage, "output_tokens", 0) or 0),
                     requests=1,
                 )
+
+    def plan_tool(
+        self,
+        *,
+        question: str,
+        columns: Sequence[dict[str, str]],
+    ) -> ToolCall | None:
+        """Ask the model to select one approved operation.
+
+        The returned arguments are untrusted until ``execute_tool`` validates
+        them against Pydantic schemas and the active dataframe.
+        """
+
+        from minidatadev.ai.tools import TOOL_SCHEMAS
+
+        descriptions = {
+            "filter_data": "Filter rows with validated conditions.",
+            "sort_data": "Sort rows by one or more columns.",
+            "group_and_aggregate": "Calculate grouped totals, averages, or counts.",
+            "calculate_correlation": "Calculate correlations for numeric columns.",
+            "find_outliers": "Find outliers in one numeric column.",
+            "describe_column": "Describe one column with verified statistics.",
+            "compare_periods": "Compare a metric across two date periods.",
+            "create_chart": "Create a Plotly chart from specified columns.",
+        }
+        tools = [
+            {
+                "type": "function",
+                "name": name,
+                "description": descriptions[name],
+                "parameters": schema,
+            }
+            for name, schema in TOOL_SCHEMAS.items()
+        ]
+        response = self.client.responses.create(
+            model=self.model,
+            instructions=(
+                "Choose at most one analysis tool. Use only exact column names "
+                "from the supplied schema. If the question is ambiguous or no "
+                "tool applies, do not call a tool."
+            ),
+            input=(
+                f"DATASET COLUMNS: {json.dumps(list(columns))}\n"
+                f"USER QUESTION: {question}"
+            ),
+            tools=tools,
+            tool_choice="auto",
+        )
+        usage = getattr(response, "usage", None)
+        self._last_usage = Usage(
+            input_tokens=int(getattr(usage, "input_tokens", 0) or 0),
+            output_tokens=int(getattr(usage, "output_tokens", 0) or 0),
+            requests=1,
+        )
+        for item in getattr(response, "output", []):
+            if getattr(item, "type", "") == "function_call":
+                arguments = json.loads(getattr(item, "arguments", "{}"))
+                return ToolCall(name=getattr(item, "name", ""), arguments=arguments)
+        return None
 
 
 def _column_answer(columns: list[dict]) -> str:

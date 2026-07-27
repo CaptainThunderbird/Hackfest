@@ -8,6 +8,7 @@ from minidatadev.ai import (
     DemoProvider,
     OpenAIProvider,
 )
+from minidatadev.analysis.operations import AnalysisValidationError
 from minidatadev.config import get_settings
 
 
@@ -19,8 +20,8 @@ def render() -> None:
     )
     st.markdown(
         '<p class="mdd-subtitle">Explore the schema, clarify definitions, and '
-        "prepare questions for verified analysis. Mini only uses the bounded "
-        "dataset context shown by this workspace.</p>",
+        "run verified calculations, and inspect exactly how each answer was "
+        "produced.</p>",
         unsafe_allow_html=True,
     )
 
@@ -32,15 +33,11 @@ def render() -> None:
     for message in st.session_state.chat_messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
+            _render_artifact(message.get("artifact"))
 
     if not st.session_state.chat_messages:
         st.markdown("#### Try asking")
-        suggestions = [
-            "Which columns are available?",
-            "Where are values missing?",
-            "How many rows are in this dataset?",
-            "What questions should I explore first?",
-        ]
+        suggestions = _suggestions()
         columns = st.columns(2)
         for index, suggestion in enumerate(suggestions):
             columns[index % 2].markdown(
@@ -111,16 +108,40 @@ def _answer(question: str, provider) -> None:
     }
     with st.chat_message("assistant"):
         try:
-            answer = st.write_stream(
-                assistant.stream_reply(
-                    frame=st.session_state.active_dataset,
-                    profile=st.session_state.dataset_profile,
-                    dataset_name=st.session_state.active_dataset_name,
-                    messages=messages,
-                    session_context=session_context,
-                )
+            result = assistant.analyze(
+                frame=st.session_state.active_dataset,
+                question=question,
             )
+            if result is not None:
+                answer = result.summary
+                artifact = result.artifact()
+                st.markdown(answer)
+                _render_artifact(artifact)
+                for assumption in result.assumptions:
+                    if assumption not in st.session_state.assumptions:
+                        st.session_state.assumptions.append(assumption)
+                if result.chart is not None:
+                    st.session_state.saved_charts.append(result.chart)
+            else:
+                artifact = None
+                answer = st.write_stream(
+                    assistant.stream_reply(
+                        frame=st.session_state.active_dataset,
+                        profile=st.session_state.dataset_profile,
+                        dataset_name=st.session_state.active_dataset_name,
+                        messages=messages,
+                        session_context=session_context,
+                    )
+                )
+        except AnalysisValidationError as error:
+            artifact = None
+            answer = (
+                "I can run that calculation, but I need a clearer valid request: "
+                f"{error}"
+            )
+            st.warning(answer)
         except Exception as error:
+            artifact = None
             answer = (
                 "I couldn't complete that response. Check the provider settings "
                 f"and try again. Details: {error}"
@@ -128,10 +149,71 @@ def _answer(question: str, provider) -> None:
             st.error(answer)
 
     st.session_state.chat_messages.append(
-        {"role": "assistant", "content": str(answer)}
+        {
+            "role": "assistant",
+            "content": str(answer),
+            "artifact": artifact,
+        }
     )
     usage = assistant.last_usage
     totals = st.session_state.usage
     totals["input_tokens"] += usage.input_tokens
     totals["output_tokens"] += usage.output_tokens
     totals["requests"] += usage.requests
+
+
+def _render_artifact(artifact) -> None:
+    if not artifact:
+        return
+    table = artifact.get("table")
+    chart = artifact.get("chart")
+    if table is not None:
+        st.dataframe(table, width="stretch", hide_index=True)
+    if chart is not None:
+        st.plotly_chart(chart, width="stretch")
+    with st.expander("How this answer was produced"):
+        st.caption(f"Approved tool · {artifact['tool_name']}")
+        for index, step in enumerate(artifact.get("provenance", []), start=1):
+            st.markdown(f"{index}. {step}")
+        assumptions = artifact.get("assumptions", [])
+        if assumptions:
+            st.markdown("**Assumptions**")
+            for assumption in assumptions:
+                st.markdown(f"- {assumption}")
+        st.markdown("**Validated parameters**")
+        st.json(artifact.get("parameters", {}))
+
+
+def _suggestions() -> list[str]:
+    profile = st.session_state.dataset_profile
+    numeric = [
+        item.name for item in profile.column_profiles if item.kind == "number"
+    ]
+    groups = [
+        item.name
+        for item in profile.column_profiles
+        if item.kind in {"category", "text"}
+    ]
+    suggestions = [
+        "Which columns are available?",
+        "Where are values missing?",
+    ]
+    if numeric and groups:
+        suggestions.extend(
+            [
+                f"Show total {numeric[0]} by {groups[0]}",
+                f"Create a bar chart of total {numeric[0]} by {groups[0]}",
+            ]
+        )
+    elif len(numeric) >= 2:
+        suggestions.extend(
+            [
+                f"Calculate correlation between {numeric[0]} and {numeric[1]}",
+                f"Find outliers in {numeric[0]}",
+            ]
+        )
+    else:
+        suggestions.extend(
+            ["How many rows are in this dataset?", "Preview sample rows"]
+        )
+    return suggestions

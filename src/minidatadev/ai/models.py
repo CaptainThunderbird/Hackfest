@@ -1,6 +1,6 @@
 """Provider-neutral chat models."""
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -12,6 +12,15 @@ class ChatMessage(BaseModel):
 
     role: Literal["user", "assistant"]
     content: str = Field(min_length=1)
+
+
+class ToolCall(BaseModel):
+    """A provider-proposed call that still requires local validation."""
+
+    model_config = ConfigDict(frozen=True)
+
+    name: str = Field(min_length=1)
+    arguments: dict[str, Any]
 
 
 class Usage(BaseModel):

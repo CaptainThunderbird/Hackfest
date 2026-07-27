@@ -5,8 +5,8 @@ version will let users upload CSV or Excel data, inspect automatic profiles and
 charts, ask analytical questions conversationally, verify the calculations
 behind each answer, and export results.
 
-The current product includes the Phase 1 Streamlit workspace and the Phase 2
-schema-aware chatbot foundation.
+The current product includes the Streamlit workspace, schema-aware chatbot,
+and Phase 3 controlled analysis tools.
 
 ## Technology
 
@@ -86,6 +86,9 @@ src/minidatadev/
 - Explore automatic type and missing-value visualizations
 - Retain the active dataset and conversation context within the session
 - Stream schema-grounded answers through a provider-neutral assistant
+- Filter, sort, aggregate, correlate, compare periods, and find outliers
+- Generate verified Plotly charts through conversation
+- Inspect the approved tool, parameters, assumptions, and calculation steps
 - Use the offline demo assistant without credentials
 - Optionally use OpenAI through the Responses API
 
@@ -119,6 +122,30 @@ The provider receives a bounded JSON context containing schema, profile,
 three preview rows, and established conversation definitions. It does not
 receive a dataframe object and cannot execute generated Python.
 
+## Controlled analysis tools
+
+Analytical questions are mapped to an allowlisted operation. Every operation
+uses a strict Pydantic request model, validates columns and types against the
+active dataframe, and returns a bounded table or chart with provenance.
+
+Available operations:
+
+- `filter_data`
+- `sort_data`
+- `group_and_aggregate`
+- `calculate_correlation`
+- `describe_column`
+- `find_outliers`
+- `compare_periods`
+- `create_chart`
+- `preview_rows`
+
+Common explicit questions are planned deterministically. When OpenAI is
+enabled, the model may select one of the same approved tools for less regular
+phrasing. Model-proposed arguments remain untrusted and pass through the same
+local validation before execution. Arbitrary Python, SQL, and shell execution
+are not available.
+
 ## Secrets
 
 Never commit API keys or provider credential files. Local `.env`,
@@ -133,7 +160,7 @@ account settings.
 - Phase 0: repository rescue and reliable foundation — complete
 - Phase 1: Streamlit product shell, upload, preview, and profiling — complete
 - Phase 2: provider-neutral conversational assistant — complete
-- Phase 3: controlled, validated analysis tools and provenance
+- Phase 3: controlled, validated analysis tools and provenance — complete
 - Phase 4: automated visualizations and insights
 - Phase 5: correctness, safety, latency, and cost evaluation
 - Phase 6: persistent beta product and deployment
