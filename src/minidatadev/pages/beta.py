@@ -1,4 +1,4 @@
-"""Beta project, export, privacy, and diagnostics controls."""
+"""Packaged project, export, privacy, and diagnostics page."""
 
 import streamlit as st
 

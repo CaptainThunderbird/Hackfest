@@ -84,6 +84,7 @@ src/minidatadev/
 ├── ai/          # provider and chatbot integration (later phases)
 ├── analysis/    # validated calculations and charts (later phases)
 ├── data/        # CSV/Excel loading and sample registry
+├── pages/       # packaged Streamlit user interface
 ├── projects/    # projects and conversation state (later phases)
 └── config.py    # environment-backed configuration
 ```

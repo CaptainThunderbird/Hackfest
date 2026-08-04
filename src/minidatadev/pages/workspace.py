@@ -1,4 +1,4 @@
-"""Dataset upload and preview page."""
+"""Packaged dataset upload, cleaning, and preview page."""
 
 from pathlib import Path
 
