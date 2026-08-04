@@ -2,23 +2,21 @@
   "avengers": {
     "file": "avengers.csv",
     "difficulty": "easy",
-    "description": "fill later"
+    "description": "Dataset containing data on Avengers characters."
   },
   "college-majors": {
     "file": "majors-list.csv",
     "difficulty": "medium",
-    "description": "fill later"
+    "description": "Statistics on various college majors and their job outcomes."
   },
-  "lyrics": {
-  "file": "genius_hip_hop_lyrics.csv",
-  "difficulty":"hard",
-  "description":"fill later"
-
-
+  "hip-hop-lyrics": {
+    "file": "genius_hip_hop_lyrics.csv",
+    "difficulty": "hard",
+    "description": "Hip hop song lyrics and metadata scraped from Genius."
   },
-  "masculinity": {
+  "masculinity-survey": {
     "file": "masculinity-survey.csv",
-    "difficulty":"medium",
-    "description":"fill later"
+    "difficulty": "medium",
+    "description": "Responses from a survey on masculinity norms and perceptions."
   }
 }
