@@ -264,9 +264,9 @@ environment variables or a deployment platform's secret manager because Git
 copies committed data into clones, forks, caches, and historical objects; a
 later deletion does not make an exposed key secret again.
 
-An exposed Kaggle credential was removed during Phase 0. Repository removal
-does not revoke that key: its owner must revoke or rotate it from the Kaggle
-account settings.
+If a credential is ever exposed, revoke or rotate it at the provider before
+rewriting repository history. Deleting a file or commit is not credential
+revocation, and existing clones or forks may retain the original data.
 
 ## Beta persistence and deployment
 
