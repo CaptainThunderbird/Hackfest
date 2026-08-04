@@ -33,6 +33,13 @@ def test_report_package_contains_expected_files():
         frame=pd.DataFrame({"revenue": [10, 20]}),
         messages=[],
         insights=[],
+        cleaning_history=[
+            {
+                "actions": ["removed 1 duplicate row(s)"],
+                "rows_before": 3,
+                "rows_after": 2,
+            }
+        ],
     )
     with zipfile.ZipFile(BytesIO(payload)) as archive:
         assert set(archive.namelist()) == {
@@ -42,6 +49,8 @@ def test_report_package_contains_expected_files():
         }
         manifest = json.loads(archive.read("manifest.json"))
         assert manifest["rows"] == 2
+        assert manifest["cleaning_history"][0]["rows_after"] == 2
+        assert b"Cleaning history" in archive.read("analysis-report.html")
 
 
 def test_rate_limiter_resets_after_window():

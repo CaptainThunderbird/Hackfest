@@ -22,6 +22,8 @@ DEFAULT_SESSION = {
     "active_project_id": None,
     "onboarding_complete": False,
     "request_limiter": None,
+    "cleaning_history": [],
+    "cleaning_notice": None,
 }
 
 
@@ -56,6 +58,8 @@ def set_active_dataset(
     state["definitions"] = {}
     state["assumptions"] = []
     state["active_project_id"] = None
+    state["cleaning_history"] = []
+    state["cleaning_notice"] = None
 
 
 def save_insight(

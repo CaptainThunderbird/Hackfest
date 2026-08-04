@@ -93,6 +93,8 @@ src/minidatadev/
 - Upload and validate CSV, XLS, and XLSX files
 - Load bundled or public sample datasets
 - Preview data and inspect row, column, duplicate, and completeness metrics
+- Remove duplicate rows or explicitly drop/fill selected missing values
+- Keep an auditable cleaning history in exported analysis packages
 - Explore automatic type and missing-value visualizations
 - Retain the active dataset and conversation context within the session
 - Stream schema-grounded answers through a provider-neutral assistant
@@ -139,8 +141,14 @@ overall completeness rate. Each analysis operation then applies an explicit,
 documented policy: descriptions report nulls separately, sorting places them
 last, filters include or exclude them only through `is_null`/`not_null`,
 grouping keeps null groups, correlations use Pandas pairwise exclusion, and
-invalid dates are coerced to null before date comparisons. Any imputation or
-row removal should be a deliberate, visible preprocessing step.
+invalid dates are coerced to null before date comparisons.
+
+The **Clean dataset** panel makes preprocessing deliberate and visible. Users
+can remove exact duplicate rows, drop rows missing values in selected required
+columns, or fill selected numeric columns with their median and other columns
+with their most frequent value. Cleaning works on an in-memory copy, rebuilds
+the profile, resets analysis tied to the previous dataframe, and records every
+action in the analysis-package manifest and HTML report.
 
 ## Assistant configuration
 

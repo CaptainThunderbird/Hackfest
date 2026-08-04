@@ -100,6 +100,7 @@ def _exports() -> None:
             frame=st.session_state.active_dataset,
             messages=st.session_state.chat_messages,
             insights=st.session_state.saved_insights,
+            cleaning_history=st.session_state.cleaning_history,
         ),
         file_name=f"{safe_name}-analysis.zip",
         mime="application/zip",

@@ -10,6 +10,7 @@ def test_initialize_session_preserves_existing_values() -> None:
 
     assert state["definitions"] == {"revenue": "sales"}
     assert state["chat_messages"] == []
+    assert state["cleaning_history"] == []
 
 
 def test_setting_dataset_resets_dataset_specific_context() -> None:
@@ -19,6 +20,7 @@ def test_setting_dataset_resets_dataset_specific_context() -> None:
         "saved_charts": ["chart"],
         "definitions": {"revenue": "sales"},
         "assumptions": ["calendar year"],
+        "cleaning_history": [{"actions": ["old cleaning"]}],
     }
     frame = pd.DataFrame({"value": [1]})
 
@@ -28,6 +30,7 @@ def test_setting_dataset_resets_dataset_specific_context() -> None:
     assert state["active_dataset_name"] == "new.csv"
     assert state["chat_messages"] == []
     assert state["definitions"] == {}
+    assert state["cleaning_history"] == []
 
 
 def test_save_insight_deduplicates_by_identifier() -> None:
