@@ -8,8 +8,9 @@ kaggle.json
 
 # Python
 __pycache__/
-*.py[cod]
+*.pyc
 *.pyo
+*.pyd
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
