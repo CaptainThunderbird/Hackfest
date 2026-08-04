@@ -1,11 +1,17 @@
-"""Dataset upload and preview page."""
+"""Packaged dataset upload, cleaning, and preview page."""
 
 from pathlib import Path
 
 import streamlit as st
 
 from minidatadev.analysis import profile_dataframe
-from minidatadev.data import DatasetLoader, DatasetLoadError
+from minidatadev.data import (
+    CleaningPlan,
+    DataCleaningError,
+    DatasetLoader,
+    DatasetLoadError,
+    clean_dataframe,
+)
 from minidatadev.projects import set_active_dataset
 
 
@@ -96,6 +102,10 @@ def _load_source(
 def _active_dataset() -> None:
     frame = st.session_state.active_dataset
     profile = st.session_state.dataset_profile
+    notice = st.session_state.get("cleaning_notice")
+    if notice:
+        st.success(notice)
+        st.session_state.cleaning_notice = None
     st.divider()
     title_col, badge_col = st.columns([4, 1])
     with title_col:
@@ -113,7 +123,89 @@ def _active_dataset() -> None:
     complete_col.metric("Complete", f"{profile.completeness_percent}%")
     duplicate_col.metric("Duplicates", f"{profile.duplicate_rows:,}")
 
+    _cleaning_panel(frame, profile)
+
     st.markdown("#### Data preview")
     preview_rows = st.slider("Preview rows", 5, 50, 10)
     st.dataframe(frame.head(preview_rows), width="stretch", hide_index=True)
     st.caption("Preview only. The complete dataframe remains active in this session.")
+
+
+def _cleaning_panel(frame, profile) -> None:
+    missing_columns = [
+        item.name for item in profile.column_profiles if item.missing
+    ]
+    with st.expander("Clean dataset"):
+        st.caption(
+            "Apply deliberate, local transformations. Each change is recorded "
+            "for export, and the source file is never modified."
+        )
+        remove_duplicates = st.checkbox(
+            "Remove duplicate rows",
+            disabled=profile.duplicate_rows == 0,
+            help=f"The active dataset contains {profile.duplicate_rows:,} duplicates.",
+        )
+        missing_label = st.selectbox(
+            "Missing-value handling",
+            [
+                "Keep missing values",
+                "Drop rows missing selected values",
+                "Fill selected values automatically",
+            ],
+            disabled=not missing_columns,
+        )
+        strategy = {
+            "Keep missing values": "keep",
+            "Drop rows missing selected values": "drop_rows",
+            "Fill selected values automatically": "fill",
+        }[missing_label]
+        selected_columns = st.multiselect(
+            "Columns to handle",
+            missing_columns,
+            default=missing_columns,
+            disabled=strategy == "keep" or not missing_columns,
+        )
+        has_missing_selection = strategy == "keep" or bool(selected_columns)
+        can_apply = (remove_duplicates or strategy != "keep") and has_missing_selection
+        if st.button(
+            "Apply cleaning",
+            type="primary",
+            disabled=not can_apply,
+            width="stretch",
+        ):
+            _apply_cleaning(
+                frame,
+                CleaningPlan(
+                    remove_duplicates=remove_duplicates,
+                    missing_strategy=strategy,
+                    columns=tuple(selected_columns),
+                ),
+            )
+
+        history = st.session_state.cleaning_history
+        if history:
+            st.markdown("**Transformation history**")
+            for index, record in enumerate(history, start=1):
+                actions = "; ".join(record["actions"]) or "No data changed"
+                st.caption(f"{index}. {actions}")
+
+
+def _apply_cleaning(frame, plan: CleaningPlan) -> None:
+    try:
+        result = clean_dataframe(frame, plan)
+    except DataCleaningError as error:
+        st.error(str(error))
+        return
+
+    history = [*st.session_state.cleaning_history, result.audit_record()]
+    dataset_name = st.session_state.active_dataset_name
+    set_active_dataset(
+        st.session_state,
+        frame=result.frame,
+        name=dataset_name,
+        profile=profile_dataframe(result.frame),
+    )
+    st.session_state.cleaning_history = history
+    st.session_state.cleaning_notice = result.summary
+    st.session_state.onboarding_complete = True
+    st.rerun()

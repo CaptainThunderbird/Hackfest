@@ -52,3 +52,17 @@ def test_chat_explains_active_dashboard_chart() -> None:
     message = app.session_state["chat_messages"][-1]
     assert message["artifact"]["tool_name"] == "explain_chart"
     assert "highest plotted value" in message["content"]
+
+
+def test_workspace_applies_and_records_missing_value_cleaning() -> None:
+    app = AppTest.from_file("app.py", default_timeout=30).run()
+    app.button[0].click().run()
+
+    app.selectbox[1].set_value("Fill selected values automatically").run()
+    app.multiselect[0].set_value(["Death4"]).run()
+    app.button[1].click().run()
+
+    assert not app.exception
+    assert int(app.session_state["active_dataset"]["Death4"].isna().sum()) == 0
+    assert app.session_state["cleaning_history"][0]["missing_filled"] == 172
+    assert "Cleaning complete" in app.success[0].value

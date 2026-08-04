@@ -1,4 +1,4 @@
-"""Automatic insights and editable visualization dashboard."""
+"""Packaged automatic-insights and visualization dashboard."""
 
 import hashlib
 

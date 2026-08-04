@@ -1,4 +1,4 @@
-"""Conversational dataset exploration page."""
+"""Packaged conversational dataset-exploration page."""
 
 import streamlit as st
 

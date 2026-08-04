@@ -2,8 +2,8 @@
 
 import streamlit as st
 
+from minidatadev.pages import beta, chat, dashboard, workspace
 from minidatadev.projects import initialize_session
-from pages import beta, chat, dashboard, workspace
 
 st.set_page_config(
     page_title="MiniDataDev",
