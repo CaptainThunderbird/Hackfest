@@ -1,12 +1,16 @@
 # MiniDataDev
 
-MiniDataDev is becoming an AI-assisted data-analysis workspace. The first full
-version will let users upload CSV or Excel data, inspect automatic profiles and
-charts, ask analytical questions conversationally, verify the calculations
-behind each answer, and export results.
+MiniDataDev is an AI-assisted data-analysis workspace. Users can upload CSV or
+Excel data, inspect automatic profiles and charts, ask analytical questions
+conversationally, verify the calculations behind each answer, and export
+results.
 
 The current product includes the Streamlit workspace, schema-aware chatbot,
 controlled analysis tools, and automated insight and visualization workflows.
+
+![MiniDataDev data workspace](assets/screenshots/data-workspace.png)
+
+![MiniDataDev automatic insights dashboard](assets/screenshots/analysis-dashboard.png)
 
 ## Technology
 
@@ -52,7 +56,13 @@ controlled analysis tools, and automated insight and visualization workflows.
    python -m pip install -e ".[dev]"
    ```
 
-4. Copy `.env.example` to `.env` and adjust local settings if needed.
+4. Copy `.env.example` to `.env` and adjust local settings if needed:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   On Windows PowerShell, use `Copy-Item .env.example .env`.
 
 5. Start the app:
 
@@ -113,6 +123,25 @@ Uploaded file objects can be loaded with
 `loader.load(upload, filename=upload.name)`. Registered sample data can be
 loaded by name, for example `loader.load("avengers")`.
 
+### Loading, malformed data, and missing values
+
+`DatasetLoader` accepts local paths, Streamlit upload objects, and allowlisted
+sample names. It selects the parser from the validated `.csv`, `.xls`, or
+`.xlsx` extension, tries UTF-8 CSV decoding first, and falls back to Latin-1.
+Before Pandas parses a local or uploaded CSV, MiniDataDev checks that every
+non-empty row has the header's field count. Inconsistent rows, parser errors,
+unsupported extensions, unreadable files, and files without columns produce a
+user-facing `DatasetLoadError`; malformed rows are never silently skipped.
+
+Missing values are preserved as nulls rather than guessed or automatically
+imputed. The profile reports missing counts and percentages per column and the
+overall completeness rate. Each analysis operation then applies an explicit,
+documented policy: descriptions report nulls separately, sorting places them
+last, filters include or exclude them only through `is_null`/`not_null`,
+grouping keeps null groups, correlations use Pandas pairwise exclusion, and
+invalid dates are coerced to null before date comparisons. Any imputation or
+row removal should be a deliberate, visible preprocessing step.
+
 ## Assistant configuration
 
 The app starts in `demo` mode and requires no API key. Demo mode answers
@@ -129,6 +158,14 @@ OPENAI_API_KEY=your-local-key
 The provider receives a bounded JSON context containing schema, profile,
 three preview rows, and established conversation definitions. It does not
 receive a dataframe object and cannot execute generated Python.
+
+When OpenAI mode is enabled, the user's conversation, dataset name, schema and
+column statistics, up to three preview rows (strings truncated to 120
+characters), active filters/definitions/assumptions, and bounded active-chart
+context are sent to the configured OpenAI model. The full dataframe and local
+files are not sent by this application. Do not enable an external provider for
+sensitive data unless that disclosure is permitted by the data owner and your
+organization's policies.
 
 ## Controlled analysis tools
 
@@ -153,6 +190,17 @@ enabled, the model may select one of the same approved tools for less regular
 phrasing. Model-proposed arguments remain untrusted and pass through the same
 local validation before execution. Arbitrary Python, SQL, and shell execution
 are not available.
+
+To limit misleading answers, common analytical questions are planned
+deterministically; calculations run locally through named, allowlisted Python
+functions; Pydantic validates parameters; column existence and types are
+checked against the active dataframe; and results include the tool,
+parameters, assumptions, and calculation provenance. Ambiguous or unsupported
+requests should trigger clarification instead of a guessed calculation. The
+offline benchmark checks numerical correctness, tool selection, chart values,
+unsupported claims, malformed-data recovery, and prompt-injection resistance.
+Model-written narrative should be treated as an explanation of verified
+results, not as the source of truth.
 
 ## Automated insights and visualizations
 
@@ -211,7 +259,10 @@ artifact. The benchmark is offline-first and does not spend API credits.
 ## Secrets
 
 Never commit API keys or provider credential files. Local `.env`,
-`kaggle.json`, and Streamlit secrets are ignored.
+`kaggle.json`, and Streamlit secrets are ignored. Credentials belong in local
+environment variables or a deployment platform's secret manager because Git
+copies committed data into clones, forks, caches, and historical objects; a
+later deletion does not make an exposed key secret again.
 
 An exposed Kaggle credential was removed during Phase 0. Repository removal
 does not revoke that key: its owner must revoke or rotate it from the Kaggle

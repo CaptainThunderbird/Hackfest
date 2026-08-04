@@ -100,7 +100,7 @@ with st.sidebar:
     else:
         st.caption("Load a dataset to begin.")
     st.markdown("")
-    st.caption("Phase 1 + 2 · Local workspace")
+    st.caption("Local-first beta · Demo mode available")
 
 if page == "Data workspace":
     workspace.render()
